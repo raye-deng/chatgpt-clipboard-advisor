@@ -24,3 +24,17 @@ You can download the installation package for Mac on the release page (currently
 
 ## How to configure
 Of course, before use, you need an API key from OpenAI. Please Google for the specific application process.
+
+## Roadmap
+Regarding the plan for this tool, my personal goals are very simple:
+
+- [x] Support clipboard access to OPENAI
+- [x] Support Mac
+- [ ] Support chat context
+- [ ] Add quick commands for the following common scenarios:
+  - [ ] Chatting
+  - [ ] Code completion
+  - [ ] Translation
+  - [ ] Document optimization
+- [ ] Extracting key points
+- [ ] Support Windows.
