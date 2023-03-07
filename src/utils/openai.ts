@@ -1,7 +1,11 @@
 import {ClientRequest, net} from "electron";
+import ConfigHelper from "../../electron-preload/config";
 
+type Message = { role: string, content: string }
 export default class Client {
-    baseURL: string = "https://openai-api.proxy.dengfs.cn/v1";
+    baseURL: string = ConfigHelper.getOpenAIHost();
+
+    messages: Message[] = [];
 
     defaultOptions: any;
 
@@ -17,14 +21,14 @@ export default class Client {
         };
     }
 
-    async complete(prompt: string, model: string = "gpt-3.5-turbo"): Promise<any> {
+    async complete(prompt: string, model: string = ConfigHelper.getOpenAIModel()): Promise<any> {
         console.log(`completing prompt: ${prompt} with model: ${model}...`);
         const ps = new Promise((resolve, reject) => {
             const request: ClientRequest = net.request({
                 method: 'POST',
                 url: `${this.baseURL}/chat/completions`,
                 protocol: 'https:',
-                redirect:"follow"
+                redirect: "follow"
             })
 
             request.setHeader('Content-Type', 'application/json')
@@ -57,6 +61,9 @@ export default class Client {
             request.end();
         })
         const result: any = await ps;
+
+        console.log(`usage info: ${JSON.stringify(result.usage, undefined, 2)}`);
+
         return result.choices[0]?.message?.content;
     }
 }
