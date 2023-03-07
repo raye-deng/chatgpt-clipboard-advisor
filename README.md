@@ -3,7 +3,7 @@
 
 [中文](./README-ZH.MD) | [English](./README.md)
 
-![openai-logo](./assets/open-ai-logo.jpg)
+<img src="./assets/open-ai-logo.png" style="max-height:120px;" />
 
 ChatGPT clipboard advisor is a chatbot based on ChatGPT-3.5 that provides suggestions based on your clipboard content. 
 

@@ -1,4 +1,8 @@
 ## ChatGPT剪贴板顾问
+<img src="./assets/open-ai-logo.png" style="max-height:120px;" />
+
+[中文](./README-ZH.MD) | [English](./README.md)
+
 ChatGPT剪贴板顾问是一款基于ChatGPT-3.5的聊天机器人，可以根据您的剪贴板内容提供建议。
 
 我认为聊天和人工智能应该能够集成并在任何地方使用，而不仅仅局限于浏览器或特定应用程序。系统剪贴板是一个很好的集成点，所以我开发了这个小工具。
