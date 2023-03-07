@@ -1,5 +1,10 @@
-以下内容提供一份中文版：
+
 # ChatGPT clipboard advisor
+
+[中文](./README-ZH.MD) | [English](./README.md)
+
+![openai-logo](./assets/open-ai-logo.jpg)
+
 ChatGPT clipboard advisor is a chatbot based on ChatGPT-3.5 that provides suggestions based on your clipboard content. 
 
 I believe that chat and AI should be able to integrate and be used anywhere, not just limited to browsers or certain applications. 
