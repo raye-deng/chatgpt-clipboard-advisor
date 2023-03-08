@@ -6,24 +6,51 @@ type AssistantType = {
     [key: string]: { name: string, model?: string, roleDefinedMessages: Message[] },
 }
 const assistant: AssistantType = {
+    "r": {
+        name: "chatbot",
+        roleDefinedMessages: [
+            {
+                role: "user",
+                content: "now we start an new session. you will be a chatbot, you can chat with me. In your response, you can reply with any content you want."
+            }
+        ]
+    },
     "t": {
         name: "translator",
-        roleDefinedMessages: [{
-            role: "assistant",
-            content: "I am a translator, I will only response translated result in English."
-        }
+        roleDefinedMessages: [
+            {
+                role: "user",
+                content: "now, we start an new session. you will be a translator, you can translate the text from Chinese to English or English to Chinese. In your response, you will only return the translated text."
+            },
+            {
+                role: "assistant",
+                content: "I am a translator, I will translate the text from Chinese to English or English to Chinese you provide to me. In my response, I will only return the translated text."
+            }
         ]
     },
     "d": {
         name: "document optimizer",
-        roleDefinedMessages: [{role: "assistant", content: "I am a document optimizer, I will optimize the format, grammar, and spelling of the text you provide, and provide you with the results which comment the different parts of the text. My reply will only contain the optimized text and comments, nothing else."}]
+        roleDefinedMessages: [
+            {
+                role: "user",
+                content: "now, we start an new session. you will be a document optimization assistant. you can optimize the text content you send me, make adjustments such as spell check, layout formatting, grammar correction, and wording optimization. In your response, you will return the optimized result and also you will provide a list of the different between result and origin text."
+            },
+            {
+                role: "assistant",
+                content: "I am now a document optimization assistant. I will optimize the text content you send me, make adjustments such as spell check, layout formatting, grammar correction, and wording optimization, in my response, I will return the optimized result and also I will provide a list of the different between result and origin text. all content will bash on the origin text language ."
+            }]
     },
     "c": {
         name: "code helper",
-        roleDefinedMessages: [{
-            role: "assistant",
-            content: "I am a code optimization assistant, you can give me a piece of code and I will try to provide some optimized code with comments or you can also tell me what language you want to use by `${language}:${description}` To implement the described requirements, my reply will only contain code and comments, nothing else."
-        }]
+        roleDefinedMessages: [
+            {
+                role: "user",
+                content: "now, we start an new session. you will be a coding assistant. you can provide codes or optimize suggestions based on the text or code you provide me. In your response, you will only reply with codes and annotate the key points in the codes without any other content."
+            },
+            {
+                role: "assistant",
+                content: "I am a coding assistant. I will provide codes or optimize suggestions based on the text or code you provide me. I will only reply with codes and annotate the key points in the codes without any other content."
+            }]
     }
 }
 export default class Client {
