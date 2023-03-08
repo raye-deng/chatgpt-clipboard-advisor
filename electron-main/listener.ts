@@ -31,10 +31,15 @@ const submitClipboardQuestion = async () => {
     if (!openaiClient) {
         openaiClient = getClient();
     }
-    const answer = await openaiClient.complete(question);
-    console.log(`answer: ${answer}`);
-    clipboard.writeText(answer, "clipboard");
-    new Notification({title: "Advisor", body: "我已经将建议放到你的粘贴板了，粘贴一下试试。"}).show();
+    openaiClient.complete(question).then((answer) => {
+        console.log(`answer: ${answer}`);
+        clipboard.writeText(answer, "clipboard");
+        new Notification({title: "Advisor", body: "我已经将建议放到你的粘贴板了，粘贴一下试试。"}).show();
+
+    }).catch((error) => {
+        console.log(`submit questions error: ${JSON.stringify(error)}`);
+        new Notification({title: "发生错误", body: `从OpenAI获取建议发生了错误，${error.message}`}).show();
+    })
 }
 
 export const getClient = () => {

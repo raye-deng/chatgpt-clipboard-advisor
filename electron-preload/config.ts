@@ -2,7 +2,7 @@ import * as fs from "fs";
 import {ipcRenderer} from "electron";
 import path from "path";
 import os from "os";
-const defaultConfig = require("./default-config.json");
+import * as defaultConfig from "./default-config.json";
 
 const CONFIG_FILE_PATH = `/Users/${os.userInfo({encoding: "utf-8"}).username}/.cp-advisor/config.json`;
 export default class ConfigHelper {

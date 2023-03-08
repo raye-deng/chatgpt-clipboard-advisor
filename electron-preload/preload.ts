@@ -1,7 +1,5 @@
 import os from "os";
-import {ipcRenderer, contextBridge, ipcMain} from "electron";
-import ChannelListener from "../electron-main/channel";
-import {call} from "axios";
+import {contextBridge, ipcRenderer} from "electron";
 import ConfigHelper from "./config";
 
 console.log("platform", os.platform());
@@ -24,13 +22,13 @@ contextBridge.exposeInMainWorld("openAIClient", {
     setOpenAIKey: (key: string) => {
         ipcRenderer.send("openai-save-key", key);
     },
-    initOpenAIClient:()=>{
+    initOpenAIClient: () => {
         ipcRenderer.send("init-openai-client");
     },
-    minusWindow:()=>{
+    minusWindow: () => {
         ipcRenderer.send("window-minus");
     },
-    maximizeWindow:()=>{
+    maximizeWindow: () => {
         ipcRenderer.send("window-maximize");
     }
 })
