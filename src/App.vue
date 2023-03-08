@@ -5,6 +5,21 @@
 </template>
 
 <script lang="ts" setup>
+import {onMounted} from "vue";
+import {useRouter} from "vue-router";
+import {Back, Setting} from '@element-plus/icons-vue'
+
+let router: any;
+let route: any = {fullPath: "/"};
+let icon = Setting;
+onMounted(() => {
+  console.log("mounted");
+  router = useRouter();
+  router.beforeEach((to: any, from: any, next: any) => {
+    route = to;
+    next();
+  });
+});
 
 
 </script>

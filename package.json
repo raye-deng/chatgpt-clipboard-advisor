@@ -1,6 +1,6 @@
 {
   "name": "cp-advisor",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "scripts": {
     "build": "rimraf dist && vite build && electron-builder",
@@ -9,6 +9,7 @@
   },
   "main": "dist/electron/main.js",
   "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.3.4",
     "clipboardy": "^3.0.0",
     "electron-request": "^1.8.3",
