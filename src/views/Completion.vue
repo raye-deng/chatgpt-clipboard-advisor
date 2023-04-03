@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from 'vue'
+import {onBeforeUnmount, onMounted, Ref, ref} from 'vue'
 
 import {useRouter} from 'vue-router';
 import {Promotion, Setting} from "@element-plus/icons-vue";
+import {ElMessageBox} from "element-plus";
 
 let router;
 onMounted(() => {
@@ -13,29 +14,42 @@ onMounted(() => {
   if (qAndAFromLocalStorage) {
     qAndA.value = JSON.parse(qAndAFromLocalStorage);
   }
-})
-window.openAIClient.checkOpenAIKey((result: boolean) => {
-  if (result) {
-    useRouter().push('/set-api-key')
-  } else {
-    window.openAIClient.initOpenAIClient();
-  }
+
+  window?.openAIClient?.checkOpenAIKey((result: boolean) => {
+    if (result) {
+      useRouter().push('/set-api-key')
+    } else {
+      window.openAIClient.initOpenAIClient();
+    }
+  })
 })
 
 
-const msg = ref('show me an example of electron net module.')
+const msg = ref('prompt your question and get completions.')
 const question = ref('')
 const qAndA: any = ref([]);
-let loading: boolean = false;
+let loading: Ref<boolean> = ref(false);
 
 const askCompletion = async () => {
-  loading = true;
-  qAndA.value.push(0, 0, {q: question.value, a: 'loading...'});
-  await window.openAIClient.complete(question.value, (answer: string) => {
-    msg.value = answer;
-    console.log(`answer get in vue: ${msg.value}`);
+  loading.value = true;
+  qAndA.value.push({q: question.value, a: 'loading...'});
+  msg.value = '';
+  console.log(`askCompletion: ${question.value}`);
+  await window?.openAIClient?.complete(question.value, (chunk: string) => {
+    if (chunk.toLowerCase().startsWith("[done]")) {
+      console.log(`done`);
+      loading.value = false;
+      return;
+    } else if (chunk.toLowerCase().startsWith("[error]")) {
+      console.log(`error: ${chunk}`);
+      loading.value = false;
+      ElMessageBox.alert(chunk, 'Error', {
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+    msg.value += chunk;
     qAndA.value.filter((item: any) => item.q === question.value)[0].a = msg.value;
-    loading = false;
   });
 }
 
@@ -95,6 +109,7 @@ const goSetting = async () => {
       <el-skeleton :rows="2" style="margin-top:10px;"/>
       <el-skeleton :rows="1" style="margin-top:10px;"/>
     </div>
+    {{ msg }}
   </div>
 </template>
 

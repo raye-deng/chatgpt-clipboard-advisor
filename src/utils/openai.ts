@@ -60,6 +60,8 @@ export default class Client {
 
     defaultOptions: any;
 
+    // cli: ChatGPTCLI | null = null;
+
     constructor(private readonly apiKey: string) {
         console.log(`openai client created with api key: ${apiKey}`);
         // create openai axios instance
@@ -70,9 +72,10 @@ export default class Client {
             size: 0,
             headers: {}
         };
+
     }
 
-    async complete(prompt: string, model: string = ConfigHelper.getOpenAIModel()): Promise<any> {
+    async complete(prompt: string, model: string = ConfigHelper.getOpenAIModel(), streamHandler: (chunk: string) => void): Promise<any> {
         [prompt, model] = this.beforeComplete(prompt, model);
         console.log(`completing prompt: ${prompt} with model: ${model}...`);
         this.messages.push({role: "user", content: prompt});
@@ -87,14 +90,14 @@ export default class Client {
 
             request.setHeader('Content-Type', 'application/json')
             request.setHeader('Authorization', `Bearer ${this.apiKey}`)
+            request.setHeader("responseType", "stream")
             request.on("error", (error: any) => {
                 console.log(`request error: ${error}`);
                 reject(error);
             });
             request.on("response", (response) => {
                 response.on("data", (chunk) => {
-                    console.log(chunk.toString());
-                    resolve(JSON.parse(chunk.toString()));
+                    streamHandler(chunk.toString());
                 })
                 response.on("end", () => {
                     console.log(`response end: ${response.statusCode}`);
@@ -107,6 +110,7 @@ export default class Client {
 
             request.write(JSON.stringify({
                 model: model,
+                stream: true,
                 messages: this.messages
             }), "UTF-8", () => {
                 console.log("write completed, completions request sent: ", prompt);

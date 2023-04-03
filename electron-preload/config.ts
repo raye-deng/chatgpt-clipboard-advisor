@@ -4,6 +4,7 @@ import path from "path";
 import os from "os";
 import * as defaultConfig from "./default-config.json";
 
+
 const CONFIG_FILE_PATH = `/Users/${os.userInfo({encoding: "utf-8"}).username}/.cp-advisor/config.json`;
 export default class ConfigHelper {
     constructor() {
@@ -36,7 +37,7 @@ export default class ConfigHelper {
         return config.openaiAPIHost || "https://api.openai.com/v1";
     }
 
-    static getOpenAIModel() {
+    static getOpenAIModel(): string {
         this.createConfigFileIfNotExist();
         const config = JSON.parse(fs.readFileSync(path.resolve(CONFIG_FILE_PATH)).toString());
         return config.model || "gpt-3.5-turbo";

@@ -2,6 +2,7 @@ import {app, BrowserWindow, globalShortcut} from "electron";
 import path from "path";
 import {addShortCutListener} from "./listener";
 import ChannelListener from "./channel";
+import {Logger} from "../electron-preload/common/logger";
 
 
 const createWindow = () => {
@@ -21,8 +22,10 @@ const createWindow = () => {
     new ChannelListener(win).init(); // 初始化openai client
     // 如果打包了，渲染index.html
     if (app.isPackaged) {
+        console.log(`app is packaged,load file ${path.join(__dirname, "../index.html")}`);
         win.loadFile(path.join(__dirname, "../index.html"));
     } else {
+        console.log(`app is not packaged,load url http://localhost:3000`);
         let url = "http://localhost:3000"; // 本地启动的vue项目路径
         win.loadURL(url);
     }
@@ -32,6 +35,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
     createWindow(); // 创建窗口
     app.on("activate", () => {
+        console.log('app activate,create window');
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
 });
@@ -39,11 +43,13 @@ app.whenReady().then(() => {
 
 // 关闭窗口
 app.on("window-all-closed", () => {
+    console.log('app window all closed,quit app')
     if (process.platform !== "darwin") {
         app.quit();
     }
 });
 
 app.on('will-quit', () => {
+    console.log('app will quit,unregister all shortcuts');
     globalShortcut.unregisterAll()
 })

@@ -1,13 +1,15 @@
-import {globalShortcut, clipboard, Notification} from "electron";
+import {clipboard, globalShortcut, Notification} from "electron";
 import Client from "../src/utils/openai";
-
-import clipboardy from 'clipboardy';
 import ConfigHelper from "../electron-preload/config";
+import AssistantService from "../electron-preload/openai/assistant.service";
 
 let openaiClient: Client;
+const assistantService = new AssistantService((chunk: string) => {
+    process.stdout.write(chunk);
+});
 export const addShortCutListener = () => {
     // 注册一个'CommandOrControl+X' 快捷键监听器
-    console.log('registering CommandOrControl+Q')
+    globalShortcut.unregisterAll();
     const ret = globalShortcut.register('CommandOrControl+Q', async () => {
         console.log('CommandOrControl+Q is pressed')
         await submitClipboardQuestion();
@@ -17,8 +19,6 @@ export const addShortCutListener = () => {
         console.log('registration failed')
     }
 
-    // 检查快捷键是否注册成功
-    console.log('is registered: ', globalShortcut.isRegistered('CommandOrControl+Q'));
     new Notification({
         title: "快捷键监听已启用",
         body: "您可以在复制文本后，通过Command/Ctrl + Q来向OpenAI请求建议"
@@ -26,16 +26,21 @@ export const addShortCutListener = () => {
 }
 
 const submitClipboardQuestion = async () => {
-    new Notification({title: "Advisor", body: "稍等，我思考一下."}).show();
+    const thinkingNotification = new Notification({title: "Advisor", body: "稍等，我思考一下."});
     const question = readClipboardQuestion();
     if (!openaiClient) {
         openaiClient = getClient();
     }
-    openaiClient.complete(question).then((answer) => {
-        console.log(`answer: ${answer}`);
+    thinkingNotification.show();
+    assistantService.assistantSteamHandler = (chunk: string) => {
+        process.stdout.write(chunk);
+        thinkingNotification.body += chunk;
+        thinkingNotification.show();
+    }
+    assistantService.askQuestion(question).then((answer: string) => {
         clipboard.writeText(answer, "clipboard");
-        new Notification({title: "Advisor", body: "我已经将建议放到你的粘贴板了，粘贴一下试试。"}).show();
-
+        const notification = new Notification({title: "Advisor", body: "我已经将建议放到你的粘贴板了，粘贴一下试试。"});
+        notification.show();
     }).catch((error) => {
         console.log(`submit questions error: ${JSON.stringify(error)}`);
         new Notification({title: "发生错误", body: `从OpenAI获取建议发生了错误，${error.message}`}).show();

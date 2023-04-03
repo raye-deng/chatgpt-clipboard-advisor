@@ -1,20 +1,21 @@
 // handle openai api
-import {BrowserWindow, ipcMain, ipcRenderer, Notification} from "electron"
-import Client from "../src/utils/openai";
-import {getClient} from "./listener";
+import {BrowserWindow, ipcMain, Notification} from "electron"
 import ConfigHelper from "../electron-preload/config";
+import AssistantService from "../electron-preload/openai/assistant.service";
 
 export default class ChannelListener {
-    private client: Client;
+    assistantService: AssistantService;
 
     constructor(private readonly win: BrowserWindow) {
         console.log('channel listener created')
+        this.assistantService = new AssistantService((chunk: string) => {
+            process.stdout.write(chunk);
+        });
     }
 
     init() {
         ipcMain.on("init-openai-client", () => {
             console.log("web content ready, trying to init openai client");
-            this.client = getClient();
             this.listen();
         })
         ipcMain.on("openai-save-key", (event, key) => {
@@ -39,11 +40,15 @@ export default class ChannelListener {
         ipcMain.on("openai-complete", async (event, question) => {
             try {
                 console.log(`received openai-complete event with question: ${question}`);
-                const answer = await this.client.complete(question);
-                event.sender.send("openai-completion-reply", answer);
-                console.log(`send answer to sender: ${answer}`);
+                this.assistantService.assistantSteamHandler = (chunk: string) => {
+                    event.sender.send("openai-completion-reply", chunk);
+                }
+                const answer = await this.assistantService.askQuestion(question);
+                event.sender.send("openai-completion-reply", `[Done]: ${answer}`);
+
             } catch (e: any) {
-                new Notification({title: '请求失败', body: e.message, silent: true}).show();
+                event.sender.send("openai-completion-reply", `[Error]: ${e.message}`);
+                new Notification({title: 'Request Failure', body: e.message, silent: true}).show();
             }
         })
 

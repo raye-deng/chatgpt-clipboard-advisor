@@ -2,19 +2,16 @@ import os from "os";
 import {contextBridge, ipcRenderer} from "electron";
 import ConfigHelper from "./config";
 
-console.log("platform", os.platform());
+
+console.log(`os: ${os.platform()}, expose openai client to renderer process.`);
 
 
 contextBridge.exposeInMainWorld("openAIClient", {
     complete: (prompt: string, callback: (answer: string) => {}): void => {
         ipcRenderer.on("openai-completion-reply", (event, answer) => {
-            console.log(`received completion: ${answer}`);
             callback(answer);
         });
-        console.log(`reply listener registered`);
         ipcRenderer.send("openai-complete", prompt);
-        console.log(`send complete event: ${prompt}`);
-
     },
     checkOpenAIKey: (callback: (result: boolean) => {}) => {
         callback(ConfigHelper.needToSetKey());
